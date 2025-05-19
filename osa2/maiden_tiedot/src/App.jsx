@@ -82,7 +82,8 @@ function App() {
   const WeatherInfo = (props) => {
     const [weather, setWeather] = useState(null);
     const [imageLink, setImageLink] = useState("")
-    const apiKey = import.meta.env.VITE_SOME_KEY
+    const apiKey = "055f136004cf28852dd3e29ee43ea950"
+    // const apiKey = import.meta.env.VITE_SOME_KEY
 
     useEffect(() => {
       const geocodeUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${props.capital}&limit=1&appid=${apiKey}`;
