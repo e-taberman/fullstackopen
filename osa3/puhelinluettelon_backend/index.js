@@ -22,10 +22,6 @@ app.get("/", (request, response) => {
     response.send('<h1>Puhelinluettelo</h1><a href="/api/persons">View contacts</a>')
 })
 
-// app.get("/api/persons", (request, response) => {
-//     response.send(persons)
-// })
-
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
     response.json(persons)
