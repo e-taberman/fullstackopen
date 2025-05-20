@@ -18,9 +18,9 @@ app.use(morgan(":method :url :status :res[content-length] - :response-time ms :b
 
 let persons = []
 
-app.get("/", (request, response) => {
-    response.send('<h1>Puhelinluettelo</h1><a href="/api/persons">View contacts</a>')
-})
+// app.get("/", (request, response) => {
+//     response.send('<h1>Puhelinluettelo</h1><a href="/api/persons">View contacts</a>')
+// })
 
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
@@ -28,29 +28,34 @@ app.get('/api/persons', (request, response) => {
   })
 })
 
-app.get("/api/info", (request, response) => {
-    const responseObj = `
-    <div>
-        <p>Phonebook has info for ${persons.length} people</p>
-        <p>${new Date()}</p>
-    </div>`
-    response.send(responseObj)
+app.get("/api/info", (request, response, next) => {
+    dog.find({})
+        .then(personsInDatabase => {
+            const responseObj = `
+            <div>
+                <p>Phonebook has info for ${personsInDatabase.length} people</p>
+                <p>${new Date()}</p>
+            </div>`
+            response.send(responseObj)
+        })
+        .catch(error => next(error))
 })
 
-app.get("/api/persons/:id", (request, response) => {
+app.get("/api/persons/:id", (request, response, next) => {
     const id = request.params.id
-    Person.findById(id).then(person => {
-        if (person) {
-            console.log(person)
-            response.json(person)
-        }
-        else {
-            response.status(404).end()
-        }
-    })
+    Person.findById(id)
+        .then(person => {
+            if (person) {
+                response.json(person)
+            }
+            else {
+                response.status(404).end()
+            }
+        })
+        .catch(error => next(error))
 })
 
-app.delete("/api/persons/:id", (request, response) => {
+app.delete("/api/persons/:id", (request, response, next) => {
     const id = request.params.id
     persons = persons.filter(person => person.id !== id)
 
@@ -63,26 +68,11 @@ app.delete("/api/persons/:id", (request, response) => {
                 response.status(404).json({ error: "Person not found" })
             }
         })
+        .catch(error => next(error))
 })
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
     const body = request.body
-
-    if (!body.name) {
-        return response.status(400).json( {
-            error: "Name missing!"
-        })
-    }
-    else if (!body.number) {
-        return response.status(400).json( {
-            error: "Number missing!"
-        })
-    }
-    else if (persons.some(person => person.name === body.name)) {
-        return response.status(400).json({
-            error: "Person is already in the phonebook!"
-        })
-    }
 
     const person = new Person({
         name: body.name,
@@ -90,13 +80,43 @@ app.post("/api/persons", (request, response) => {
         id: (Math.floor(Math.random() * 1000000)).toString()
     })
 
-    person.save().then(savedPerson => {
-        response.json(savedPerson)
-    })
+    person.save()
+        .then(savedPerson => {
+            response.json(savedPerson)
+        })
+        .catch(error => next(error))
 
 })
+
+app.put("/api/persons/:id", (request, response, next) => {
+    console.log(request.body.name)
+    Person.findOneAndUpdate(
+        { name: request.body.name },
+        { number: request.body.number },
+        { new: true, runValidators: true, context: 'query' }
+    )
+        .then(updatedPerson => {
+            if (updatedPerson) {
+                response.json(updatedPerson)
+            } else {
+                response.status(404).json({ error: "Updtated person not found" })
+            }
+        })
+        .catch(error => next(error))
+})
+
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
+
+const errorHandler = (error, request, response, next) => {
+    if (error.name === "CastError") {
+        return response.status(400).send({ error: "Malformatted id" })
+    }
+
+    next(error)
+}
+
+app.use(errorHandler)

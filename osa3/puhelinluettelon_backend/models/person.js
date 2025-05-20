@@ -29,20 +29,6 @@ personSchema.set("toJSON", {
     }
 })
 
-// const addPerson = (props) => {
-//     console.log(props)
-//   const person = new Person({
-//     name: process.argv[3],
-//     number: process.argv[4],
-//     id: (Math.floor(Math.random() * 1000000000)).toString()
-//   })
-
-//   person.save().then(result => {
-//     console.log(`Added ${process.argv[3]} number ${process.argv[4]} to the phonebook`)
-//     mongoose.connection.close()
-//   })
-// }
-
 const Person = mongoose.model("Person", personSchema)
 
 module.exports = mongoose.model("Person", personSchema)

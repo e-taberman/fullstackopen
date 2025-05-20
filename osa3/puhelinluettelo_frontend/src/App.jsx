@@ -98,16 +98,6 @@ const App = () => {
     }
   }
 
-  // const checkIfPersonExists = (name) => {
-  //   console.log(name)
-  //   personService
-  //     .getAll()
-  //     .then(response => {
-  //       console.log("checkIfPesonExists:", (response.some(person => person.name === name)))
-  //       return (response.some(person => person.name === name))
-  //     })
-  // }
-
   const handleSubmit = (event) => {
     event.preventDefault()
     if (newName === null || newName === "") {
@@ -121,6 +111,8 @@ const App = () => {
           const newPerson = { ...foundPerson, number: newNumber}
           setErrorColor("green")
           setErrorText(`The number of "${newName}" has been updated.`)
+          setNewName("")
+          setNewNumber("")
 
           personService.updateNumber(foundPerson.id, newPerson).then((updatedPerson) => {
             const updatedPersons = allPersons.map(person =>
