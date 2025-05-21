@@ -16,7 +16,7 @@ const create = (newPerson) => {
 
 const remove = (personsList, id) => {
     return axios.delete(`${serverUrl}${id}`).then(() => {
-        return getAll().then((response) => {
+        return getAll().then(() => {
             return personsList.filter(p => p.id !== id)
         })
     })
