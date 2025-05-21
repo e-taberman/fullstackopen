@@ -74,22 +74,35 @@ app.delete("/api/persons/:id", (request, response, next) => {
 app.post("/api/persons", (request, response, next) => {
     const body = request.body
 
-    const person = new Person({
-        name: body.name,
-        number: body.number,
-        id: (Math.floor(Math.random() * 1000000)).toString()
-    })
 
-    person.save()
-        .then(savedPerson => {
-            response.json(savedPerson)
+    if (!body.name || !body.number) {
+        return response.status(400).json({ error: "Name or number missing" })
+    }
+
+    Person.findOne({ name: body.name })
+        .then(existingPerson => {
+            if (existingPerson) {
+                return response.status(400).json({ error: "That person already exists" })
+            }
+
+            const person = new Person({
+                name: body.name,
+                number: body.number,
+                id: (Math.floor(Math.random() * 1000000)).toString()
+            })
+
+            person.save()
+                .then(savedPerson => {
+                    response.json(savedPerson)
+                })
+                .catch(error => next(error))
         })
         .catch(error => next(error))
 
+    return
 })
 
 app.put("/api/persons/:id", (request, response, next) => {
-    console.log(request.body.name)
     Person.findOneAndUpdate(
         { name: request.body.name },
         { number: request.body.number },
@@ -105,7 +118,6 @@ app.put("/api/persons/:id", (request, response, next) => {
         .catch(error => next(error))
 })
 
-
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
@@ -114,6 +126,9 @@ app.listen(PORT, () => {
 const errorHandler = (error, request, response, next) => {
     if (error.name === "CastError") {
         return response.status(400).send({ error: "Malformatted id" })
+    }
+    else if (error.name === "ValidationError") {
+        return response.status(400).json({ error: error.message })
     }
 
     next(error)

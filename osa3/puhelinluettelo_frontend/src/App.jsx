@@ -101,7 +101,8 @@ const App = () => {
   const handleSubmit = (event) => {
     event.preventDefault()
     if (newName === null || newName === "") {
-      setErrorText(`Invalid name.`)
+      setErrorText("Invalid name.")
+      setErrorColor("red")
       return null
     }
     personService.getAll().then((allPersons) => {
@@ -125,21 +126,31 @@ const App = () => {
         else return null
       }
       else {
-        setErrorColor("green")
-        setErrorText(`"${newName}" was added to the phonebook.`)
         const newPerson = { name: newName, number: newNumber }
-        personService.create(newPerson).then((createdPerson) => {
-          const updatedPersons = [...allPersons, createdPerson]
-          setPersons(updatedPersons)
 
-          const newShowedPersons = updatedPersons.filter(person =>
-            person.name.toLowerCase().includes(newSearch)
-          )
-          setShowedPersons(newShowedPersons)
+        personService.create(newPerson)
+          .then((createdPerson) => {
+            const updatedPersons = [...allPersons, createdPerson]
+            setPersons(updatedPersons)
 
-          setNewName("")
-          setNewNumber("")
-        })
+            const newShowedPersons = updatedPersons.filter(person =>
+              person.name.toLowerCase().includes(newSearch)
+            )
+            setShowedPersons(newShowedPersons)
+
+            setNewName("")
+            setNewNumber("")
+            setErrorColor("green")
+            setErrorText(`"${newName}" was added to the phonebook.`)
+          })
+          .catch((error) => {
+            setErrorColor("red")
+            if (error.response && error.response.data && error.response.data.error) {
+              setErrorText(error.response.data.error)
+            } else {
+              setErrorText("ERROR!")
+            }
+          })
       }
     })
   }

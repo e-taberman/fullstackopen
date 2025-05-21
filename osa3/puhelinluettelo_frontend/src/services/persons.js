@@ -9,7 +9,9 @@ const getAll = () => {
 
 const create = (newPerson) => {
     const request = axios.post(serverUrl, newPerson)
-    return request.then(response => response.data)
+    return request.then(response => {
+        return response.data
+    })
 }
 
 const remove = (personsList, id) => {
