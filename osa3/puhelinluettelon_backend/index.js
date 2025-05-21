@@ -29,7 +29,7 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get("/api/info", (request, response, next) => {
-    dog.find({})
+    Person.find({})
         .then(personsInDatabase => {
             const responseObj = `
             <div>
@@ -65,7 +65,7 @@ app.delete("/api/persons/:id", (request, response, next) => {
                 response.status(204).end()
             }
             else {
-                response.status(404).json({ error: "Person not found" })
+                response.status(404).end()
             }
         })
         .catch(error => next(error))
