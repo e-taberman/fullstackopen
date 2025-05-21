@@ -110,18 +110,25 @@ const App = () => {
         if (window.confirm(`${newName} is already added to the phonebook, replace old number with  a new one?`)) {
           const foundPerson = allPersons.find((p) => p.name === newName)
           const newPerson = { ...foundPerson, number: newNumber}
-          setErrorColor("green")
-          setErrorText(`The number of "${newName}" has been updated.`)
-          setNewName("")
-          setNewNumber("")
 
-          personService.updateNumber(foundPerson.id, newPerson).then((updatedPerson) => {
-            const updatedPersons = allPersons.map(person =>
-              person.id === updatedPerson.id ? updatedPerson : person
-            )
-            setPersons(updatedPersons)
-            setShowedPersons(updatedPersons)
-          })
+          personService.updateNumber(foundPerson.id, newPerson)
+            .then((updatedPerson) => {
+              const updatedPersons = allPersons.map(person =>
+              person.id === updatedPerson.id ? updatedPerson : person)
+              setPersons(updatedPersons)
+              setShowedPersons(updatedPersons)
+              setErrorColor("green")
+              setErrorText(`The number of "${newName}" has been updated.`)
+              setNewName("")
+              setNewNumber("")
+            })
+            .catch((error) => {
+              setErrorColor("red")
+              console.log()
+              setErrorText(error.response.data.error)
+            })
+
+
         }
         else return null
       }
@@ -157,7 +164,7 @@ const App = () => {
 
   const handlePersonRemoval = (id, name) => {
     personService.getAll().then((allPersons) => {
-      const exists = allPersons.some(person => person.id === id);
+      const exists = allPersons.some(person => person.id === id)
       if (!exists) {
         setErrorColor("red")
         setErrorText(`"${name}" has already been removed from the phonebook.`)
