@@ -1,6 +1,5 @@
 const { test, after, beforeEach, describe } = require('node:test')
 const assert = require('node:assert')
-const blogsRouter = require('express').Router()
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
@@ -180,8 +179,8 @@ test('blog was edited', async () => {
 
   assert.strictEqual(response.status, 200)
 
-  const blogsAfterUpdate = await api.get('/api/blogs')
-  const updatedBlog = blogsAfterUpdate.body.find(blog => blog.id === response.body.id)
+  const newBlogs = await api.get('/api/blogs')
+  const updatedBlog = newBlogs.body.find(blog => blog.id === response.body.id)
 
   // console.log("UPDATED BLOG:", updatedBlog.likes)
   assert.strictEqual(updatedBlog.likes, newBlog.likes)
