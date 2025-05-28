@@ -1,14 +1,16 @@
-const usersRounter = require('express').Router()
+const usersRouter = require('express').Router()
 const { default: mongoose } = require('mongoose')
 const User = require('../models/user')
+const Blog = require('../models/blog')
 const bcrypt = require('bcrypt')
 
-usersRounter.get('/', async (request, response) => {
-    const users = await User.find({})
+usersRouter.get('/', async (request, response) => {
+    const users = await User.find({}).populate('blogs', { title: 1, author: 1, url: 1 })
+
     response.json(users)
 })
 
-usersRounter.post('/', async (request, response) => {
+usersRouter.post('/', async (request, response) => {
     const { name, username, password } = request.body
 
     if (!password || password.length < 3) {
@@ -28,4 +30,4 @@ usersRounter.post('/', async (request, response) => {
     response.status(201).json(savedUser)
 })
 
-module.exports = { usersRounter }
+module.exports = { usersRouter }
