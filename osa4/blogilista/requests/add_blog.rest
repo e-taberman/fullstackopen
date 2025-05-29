@@ -1,11 +1,11 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJvYjU0MyIsImlkIjoiNjgzNzFiYWUyNzc1MTU3OGEyZjc0MzU1IiwiaWF0IjoxNzQ4NDQyMDc0fQ.3FpZFKymd70rjIjCU9csYSxxYKgH3hFZliW3szx0JUM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJvYjU0MyIsImlkIjoiNjgzNzUxMTgzMDdlZTgwNmVjYjQzMWM1IiwiaWF0IjoxNzQ4NTE2MDY5fQ.1sOF6OXc5Q87oXaLJL54bvU2NKHlCvXWvAMvWcvjug4
 
 {
-  "title": "Titlej",
-  "author": "Authorghjghjghj",
-  "url": "ffgodfjgodfgfd.com",
+  "title": "Title!",
+  "author": "Dog Writer",
+  "url": "google.com",
   "likes": 5,
   "userId": "68370b5627866ea51864c596"
 }

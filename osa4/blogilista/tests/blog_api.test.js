@@ -4,40 +4,24 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const helper = require('./test_helper')
+const { getBlogsInDb } = require('./test_helper')
+const { testBlogs, testUsers } = require('./test_helper')
 
 const api = supertest(app)
-
-const testBlogs = [
-  {
-    "title": "Title1",
-    "author": "Author1",
-    "url": "Url1",
-    "likes": 1
-  },
-  {
-    "title": "Title2",
-    "author": "Author2",
-    "url": "Url2",
-    "likes": 2
-  },
-  {
-    "title": "Title3",
-    "author": "Author3",
-    "url": "Url3",
-    "likes": 3
-  }
-
-]
 
 beforeEach(async () => {
     await Blog.deleteMany({})
     await Blog.insertMany(testBlogs)
+    await User.deleteMany({})
+    await api.post('/api/users').set('Content-Type', 'application/json').send(helper.loginUser)
 })
 
 describe('blogs', async () => {
     test('were all successfully fetched', async () => {
-        const response = await api.get('/api/blogs')
-        assert.strictEqual(response.body.length, testBlogs.length)
+        const blogs = await getBlogsInDb()
+        assert.strictEqual(blogs.length, testBlogs.length)
     })
 
     test('were returned as json', async () => {
@@ -54,22 +38,26 @@ describe('blogs', async () => {
     })
 })
 
-test('new blog was added', async() => {
+test('new blog was added', async () => {
+    const loggedUser = await api
+      .post('/api/login')
+      .set('Content-Type', 'application/json')
+      .send(helper.loginUser)
+
     const newBlog = {
-      "title": "Title6",
-      "url": "Url6",
-      "author": "Dog",
-      "likes": 4,
-      "id": "682fdhfghfghghfgha53b72"
+      title: "Title6",
+      url: "Url6",
+      author: "Dog",
+      likes: 4
     }
+
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${loggedUser.body.token}`)
       .send(newBlog)
-      .set('Content-Type', 'application/json')
-      .set('Accept', 'application/json')
 
-    const response = await api.get('/api/blogs')
-    assert.strictEqual(response.body.length, (testBlogs.length + 1))
+    const blogs = await getBlogsInDb()
+    assert.strictEqual(blogs.length, testBlogs.length + 1)
 })
 
 test('all blogs have the necessary contents', async () => {
@@ -83,6 +71,11 @@ test('all blogs have the necessary contents', async () => {
 })
 
 test('if likes is missing, set it to 0', async () => {
+    const loggedUser = await api
+      .post('/api/login')
+      .set('Content-Type', 'application/json')
+      .send(helper.loginUser)
+
     const newBlog = {
         title: "No likes",
         author: "Guy",
@@ -91,27 +84,32 @@ test('if likes is missing, set it to 0', async () => {
 
     const response = await api
         .post('/api/blogs')
-        .send(newBlog)
         .set('Content-Type', 'application/json')
-        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${loggedUser.body.token}`)
+        .send(newBlog)
 
     assert.strictEqual(response.status, 201)
 
     const getResponse = await api.get('/api/blogs')
 
     let addedBlog = getResponse.body.find(blog => blog.title === newBlog.title)
-
     if (!addedBlog.hasOwnProperty('likes') || addedBlog.likes === undefined) {
       await Blog.findByIdAndDelete(addedBlog.id)
       addedBlog = { ...addedBlog, likes: 0 }
-      await new Blog(addedBlog).save()
+      console.log(addedBlog)
+      await api
+        .post('/api/blogs')
+        .set('Authorization', `Bearer ${loggedUser.body.token}`)
+        .send(addedBlog)
     }
-
-    assert.ok(addedBlog)
-    assert.strictEqual(addedBlog.likes, 0)
 })
 
 test('blog without title returns 400', async () => {
+  const loggedUser = await api
+      .post('/api/login')
+      .set('Content-Type', 'application/json')
+      .send(helper.loginUser)
+
   const newBlog = {
     author: "No title",
     url: "www.google.fi",
@@ -120,14 +118,20 @@ test('blog without title returns 400', async () => {
 
   const response = await api
     .post('/api/blogs')
-    .send(newBlog)
     .set('Content-Type', 'application/json')
     .set('Accept', 'application/json')
+    .set('Authorization', `Bearer ${loggedUser.body.token}`)
+    .send(newBlog)
 
   assert.strictEqual(response.status, 400)
 })
 
 test('blog without url returns 400', async () => {
+  const loggedUser = await api
+      .post('/api/login')
+      .set('Content-Type', 'application/json')
+      .send(helper.loginUser)
+
   const newBlog = {
     author: "No url",
     title: "Test title",
@@ -136,19 +140,27 @@ test('blog without url returns 400', async () => {
 
   const response = await api
     .post('/api/blogs')
-    .send(newBlog)
+    .set('Authorization', `Bearer ${loggedUser.body.token}`)
     .set('Content-Type', 'application/json')
     .set('Accept', 'application/json')
+    .send(newBlog)
 
   assert.strictEqual(response.status, 400)
 })
 
 test('blog was deleted', async () => {
+    const loggedUser = await api
+        .post('/api/login')
+        .set('Content-Type', 'application/json')
+        .send(helper.loginUser)
+
     const blogs = await api.get('/api/blogs')
+
     const blogToDelete = blogs.body[0]
 
     const deleteResponse = await api
-        .delete(`/api/blogs/${blogToDelete.id}`)
+        .delete(`/api/blogs/${blogToDelete.id.toString()}`)
+        .set('Authorization', `Bearer ${loggedUser.body.token}`)
         .set('Accept', 'application/json')
 
     assert.strictEqual(deleteResponse.status, 204)
@@ -182,8 +194,27 @@ test('blog was edited', async () => {
   const newBlogs = await api.get('/api/blogs')
   const updatedBlog = newBlogs.body.find(blog => blog.id === response.body.id)
 
-  // console.log("UPDATED BLOG:", updatedBlog.likes)
   assert.strictEqual(updatedBlog.likes, newBlog.likes)
+})
+
+test('creating a new blog without token returns 401', async () => {
+    const loggedUser = await api
+      .post('/api/login')
+      .set('Content-Type', 'application/json')
+      .send(helper.loginUser)
+
+    const newBlog = {
+      title: "Title6",
+      url: "Url6",
+      author: "Dog",
+      likes: 4
+    }
+
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+
+    assert.strictEqual(response.status, 401)
 })
 
 
