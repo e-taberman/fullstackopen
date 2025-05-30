@@ -1,0 +1,10 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJvYjU0MyIsImlkIjoiNjgzNzUxMTgzMDdlZTgwNmVjYjQzMWM1IiwiaWF0IjoxNzQ4NTE2MDY5fQ.1sOF6OXc5Q87oXaLJL54bvU2NKHlCvXWvAMvWcvjug4
+
+{
+  "title": "Title!",
+  "author": "Dog Writer",
+  "url": "google.com",
+  "likes": 5
+}
