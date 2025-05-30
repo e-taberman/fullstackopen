@@ -2,61 +2,9 @@ import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
-
-const InputField = (props) => {
-  return (
-    <div>
-      {props.text} <input type="text" onChange={event => props.setValue(event.target.value)} ></input>
-    </div>
-  )
-}
-
-const Notification = (props) => {
-  const notificationStyle = {
-    color: props.color || "red",
-    fontWeight: "bold",
-    borderStyle: "solid",
-    padding: "5px",
-    marginBottom: "10px"
-  }
-
-  useEffect(() => {
-    if (props.message) {
-      const timer = setTimeout(() => {
-        props.setErrorText("")
-      }, 2000)
-      return () => clearTimeout(timer);
-    }
-  })
-
-  if (props.message !== "") return <div style={notificationStyle}>{props.message}</div>
-  else return <div>{props.message}</div>
-}
-
-const BlogCreator = (props) => {
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
-
-  useEffect(() => {
-    const updatedBlog = {
-      "title": title,
-      "author": author,
-      "url": url
-    };
-    props.setNewBlog(updatedBlog);
-  }, [title, author, url]);
-
-  return (
-    <div>
-      <h2>create new blog</h2>
-      <InputField text="title:" setValue={setTitle}></InputField>
-      <InputField text="author:" setValue={setAuthor}></InputField>
-      <InputField text="url:" setValue={setUrl}></InputField>
-      <button onClick={props.onSubmit} >create</button>
-    </div>
-  )
-}
+import InputField from './components/InputField'
+import Notification from './components/Notification'
+import BlogCreator from './components/BlogCreator'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -142,6 +90,7 @@ const App = () => {
 
   }
 
+  // NOT LOGGED IN
   if (user === null) {
     return (
     <div>
@@ -154,6 +103,7 @@ const App = () => {
   )
   }
 
+  // LOGGED IN
   return (
     <div>
       <h2>blogs</h2>
