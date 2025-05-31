@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
+import PropTypes from 'prop-types'
 
-const Notification = (props) => {
+const Notification = ({ message, setErrorText, color }) => {
   const notificationStyle = {
-    color: props.color || "red",
+    color: color || "red",
     fontWeight: "bold",
     borderStyle: "solid",
     padding: "5px",
@@ -10,16 +11,22 @@ const Notification = (props) => {
   }
 
   useEffect(() => {
-    if (props.message) {
+    if (message) {
       const timer = setTimeout(() => {
-        props.setErrorText("")
+        setErrorText("")
       }, 2000)
       return () => clearTimeout(timer);
     }
-  })
+  }, [message])
 
-  if (props.message !== "") return <div style={notificationStyle}>{props.message}</div>
-  else return <div>{props.message}</div>
+  if (message !== "") return <div style={notificationStyle}>{message}</div>
+  else return <div>{message}</div>
+}
+
+Notification.propTypes = {
+  message: PropTypes.string.isRequired,
+  color: PropTypes.string.isRequired,
+  setErrorText: PropTypes.func.isRequired,
 }
 
 export default Notification

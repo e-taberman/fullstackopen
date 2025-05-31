@@ -13,7 +13,27 @@ const postBlog = (blog, user) => {
     }
   }
   const request = axios.post(baseUrl, blog, config)
-  return request.then(response => request)
+  return request.then(() => request)
 }
 
-export default { getAll, postBlog }
+const updateBlog = (id, updateBlog, user) => {
+  const config = {
+    headers: { Authorization: `Bearer ${user.token}`}
+  }
+  const request = axios.put(`${baseUrl}/${id}`, updateBlog, config)
+  return request.then(() => request)
+}
+
+const deleteBlog = (id, user) => {
+  const config = {
+    headers: { Authorization: `Bearer ${user.token}`}
+  }
+  return axios.delete(`${baseUrl}/${id}`, config)
+}
+
+export default {
+  getAll,
+  postBlog,
+  updateBlog,
+  deleteBlog
+}

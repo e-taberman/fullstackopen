@@ -11,10 +11,8 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [token, setToken] = useState(null)
-  const [newBlog, setNewBlog] = useState(null)
-  const [errorText, setErrorText] = useState("")
-  const [errorColor, setErrorColor] = useState("red")
+  const [errorText, setErrorText] = useState('')
+  const [errorColor, setErrorColor] = useState('red')
 
   useEffect(() => { updateBlogs()}, [])
 
@@ -25,7 +23,7 @@ const App = () => {
         setBlogs(blogs)
       })
       .then(() => {
-        automaticLogin()
+        if (user === null) automaticLogin()
       })
   }
 
@@ -41,7 +39,6 @@ const App = () => {
     loginService
       .login(parsed.username, parsed.password)
       .then((response) => {
-        setToken(response.token)
         setUser(response)
       })
   }
@@ -55,10 +52,11 @@ const App = () => {
     loginService
       .login(username, password)
       .then((response) => {
-        const loginUser = JSON.stringify({"username": username, "password": password})
-        setToken(response.token)
+        const loginUser = JSON.stringify({'username': username, 'password': password})
         setUser(response)
         window.localStorage.setItem('user', loginUser)
+        setUsername('')
+        setPassword('')
       })
       .catch(error => {
         if (error.request.status === 401) {
@@ -68,36 +66,14 @@ const App = () => {
       })
   }
 
-  const createNewBlog = async () => {
-    try {
-      const request = await blogService.postBlog(newBlog, user)
-    }
-    catch(error) {
-      if (error.response.status === 400) {
-        setErrorColor('red')
-        setErrorText('title or URL missing')
-      }
-      else if (error.response.status === 401) {
-        setErrorColor('red')
-        setErrorText('unauthorized')
-      }
-      return
-    }
-
-    setErrorColor('green')
-    setErrorText(`a new blog "${newBlog.title} by ${newBlog.author} added"`)
-    updateBlogs()
-
-  }
-
   // NOT LOGGED IN
   if (user === null) {
     return (
     <div>
       <h2>login to application</h2>
       <Notification message={errorText} setErrorText={setErrorText} color={errorColor} />
-      <InputField text="username" setValue={setUsername} />
-      <InputField text="password" setValue={setPassword} />
+      <InputField text='username' setValue={setUsername} inputValue={username}/>
+      <InputField text='password' setValue={setPassword} inputValue={password} />
       <button onClick={handleLogin} >login</button>
     </div>
   )
@@ -110,10 +86,22 @@ const App = () => {
       <Notification message={errorText} setErrorText={setErrorText} color={errorColor} />
       <div>{user.name} has logged in <button onClick={handleLogout}>logout</button></div><br></br>
 
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+      <BlogCreator setErrorColor={setErrorColor}
+                   setErrorText={setErrorText}
+                   updateBlogs={updateBlogs}
+                   user={user} /><br></br>
+      {blogs.slice().sort((a, b) => b.likes - a.likes)
+      .map(blog =>
+        <Blog
+            key={blog.id}
+            blog={blog}
+            user={user}
+            setErrorColor={setErrorColor}
+            setErrorText={setErrorText}
+            updateBlogs={updateBlogs}
+          />
       )}
-      <BlogCreator setNewBlog={setNewBlog} onSubmit={createNewBlog}/><br></br>
+
     </div>
   )
 }

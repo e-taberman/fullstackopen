@@ -21,6 +21,9 @@ blogsRouter.post('/', userExtractor, async (request, response) => {
     })
   }
   try {
+    if (request.body.likes === undefined) {
+      request.body.likes = 0
+    }
     const blog = new Blog({ ...request.body, user: user._id })
 
     const savedBlog = await blog.save()

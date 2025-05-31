@@ -14,7 +14,7 @@ const login = (username, password) => {
         })
         .catch((error) => {
             if (error.response && error.response.status === 401) {
-                console.error('Unauthorized: Invalid username or password')
+                console.error('invalid username or password')
             }
             throw error
         })
