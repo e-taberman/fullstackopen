@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types'
 
-const InputField = ({ text, setValue, inputValue }) => {
+const InputField = ({ text, setValue, inputValue, id }) => {
   return (
     <div>
-      {text} <input type="text" onChange={event => setValue(event.target.value)} value={inputValue} ></input>
+      <label htmlFor={id}>{text}</label>
+      <input id={id} value={inputValue} onChange={e => setValue(e.target.value)} />
     </div>
   )
 }
@@ -11,7 +12,8 @@ const InputField = ({ text, setValue, inputValue }) => {
 InputField.propTypes = {
   text: PropTypes.string.isRequired,
   setValue: PropTypes.func.isRequired,
-  inputValue: PropTypes.string.isRequired
+  inputValue: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired
 }
 
 export default InputField

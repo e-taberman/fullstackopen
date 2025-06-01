@@ -3,12 +3,7 @@ import InputField from './InputField'
 import blogService from '../services/blogs'
 import PropTypes from 'prop-types'
 
-const BlogCreator = ({
-    setErrorColor,
-    setErrorText,
-    updateBlogs,
-    user
-  }) => {
+const BlogCreator = ({ onBlogCreation }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
@@ -24,28 +19,11 @@ const BlogCreator = ({
     setNewBlog(updatedBlog);
   }, [title, author, url]);
 
-  const createNewBlog = async () => {
-      try {
-        await blogService.postBlog(newBlog, user)
-      }
-      catch(error) {
-        if (error.response.status === 400) {
-          setErrorColor('red')
-          setErrorText('title or URL missing')
-        }
-        else if (error.response.status === 401) {
-          setErrorColor('red')
-          setErrorText('unauthorized')
-        }
-        return
-      }
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-      setErrorColor('green')
-      setErrorText(`a new blog "${newBlog.title} by ${newBlog.author} added"`)
-      updateBlogs()
-
+  const onCreateClick = () => {
+    onBlogCreation(newBlog)
+    setTitle('')
+    setAuthor('')
+    setUrl('')
   }
 
   const hideWhenVisible = { display: blogCreatorVisible ? 'none': '' }
@@ -55,10 +33,10 @@ const BlogCreator = ({
     <div>
       <div style={showWhenVisible} >
         <h2>create new blog</h2>
-        <InputField text="title:" setValue={setTitle} inputValue={title}></InputField>
-        <InputField text="author:" setValue={setAuthor} inputValue={author}></InputField>
-        <InputField text="url:" setValue={setUrl} inputValue={url}></InputField>
-        <button onClick={createNewBlog} >create</button>
+        <InputField id="title" text="title:" setValue={setTitle} inputValue={title}>title:</InputField>
+        <InputField id="author" text="author:" setValue={setAuthor} inputValue={author}></InputField>
+        <InputField id="url" text="url:" setValue={setUrl} inputValue={url}></InputField>
+        <button onClick={onCreateClick} className='createButton' >create</button>
         <br></br>
         <button onClick={() => setBlogCreatorVisible(false)}>cancel</button>
       </div>
@@ -70,10 +48,7 @@ const BlogCreator = ({
 }
 
 BlogCreator.propTypes = {
-  user: PropTypes.object.isRequired,
-  setErrorColor: PropTypes.func.isRequired,
-  setErrorText: PropTypes.func.isRequired,
-  updateBlogs: PropTypes.func.isRequired,
+  onBlogCreation: PropTypes.func.isRequired
 }
 
 export default BlogCreator

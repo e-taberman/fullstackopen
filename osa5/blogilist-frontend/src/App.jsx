@@ -66,14 +66,88 @@ const App = () => {
       })
   }
 
+  const onLikeClick = async(blog) => {
+    const newBlog = {
+      "title": blog.title,
+      "author": blog.author,
+      "url": blog.url,
+      "likes": parseInt(blog.likes) + 1
+    }
+    try {
+      await blogService.updateBlog(blog.id, newBlog, user)
+    }
+    catch(error) {
+      console.log(error)
+      if (error.response.status === 401) {
+        setErrorColor('red')
+        setErrorText('unauthorized')
+      }
+      else {
+        setErrorColor('red')
+        setErrorText(error)
+      }
+      return
+    }
+
+    setErrorColor('green')
+    setErrorText(`"${newBlog.title}" by ${newBlog.author} liked`)
+    updateBlogs()
+  }
+
+  const onDeleteClick = async(blog) => {
+    if (!confirm(`Do you want to delete "${blog.title}" by ${blog.author}`)){
+      return
+    }
+    try {
+      await blogService.deleteBlog(blog.id, user)
+    }
+
+    catch(error) {
+      console.log(error)
+      if (error.response.status === 401) {
+        setErrorColor('red')
+        setErrorText('unauthorized')
+      }
+      else {
+        setErrorColor('red')
+        setErrorText(error)
+      }
+      return
+    }
+
+    setErrorColor('green')
+    setErrorText(`"${blog.title}" by ${blog.author} deleted`)
+    updateBlogs()
+  }
+
+  const createNewBlog = async (newBlog) => {
+    try {
+      await blogService.postBlog(newBlog, user)
+    }
+    catch(error) {
+      if (error.response.status === 400) {
+        setErrorColor('red')
+        setErrorText('title or URL missing')
+      }
+      else if (error.response.status === 401) {
+        setErrorColor('red')
+        setErrorText('unauthorized')
+      }
+      return
+    }
+    setErrorColor('green')
+    setErrorText(`a new blog "${newBlog.title} by ${newBlog.author} added"`)
+    updateBlogs()
+  }
+
   // NOT LOGGED IN
   if (user === null) {
     return (
     <div>
       <h2>login to application</h2>
       <Notification message={errorText} setErrorText={setErrorText} color={errorColor} />
-      <InputField text='username' setValue={setUsername} inputValue={username}/>
-      <InputField text='password' setValue={setPassword} inputValue={password} />
+      <InputField id='username' text='username' setValue={setUsername} inputValue={username}/>
+      <InputField id='password' text='password' setValue={setPassword} inputValue={password} />
       <button onClick={handleLogin} >login</button>
     </div>
   )
@@ -89,7 +163,9 @@ const App = () => {
       <BlogCreator setErrorColor={setErrorColor}
                    setErrorText={setErrorText}
                    updateBlogs={updateBlogs}
-                   user={user} /><br></br>
+                   user={user}
+                   onBlogCreation={createNewBlog}/><br></br>
+
       {blogs.slice().sort((a, b) => b.likes - a.likes)
       .map(blog =>
         <Blog
@@ -99,6 +175,8 @@ const App = () => {
             setErrorColor={setErrorColor}
             setErrorText={setErrorText}
             updateBlogs={updateBlogs}
+            onLikeClick={onLikeClick}
+            onDeleteClick={onDeleteClick}
           />
       )}
 
