@@ -146,9 +146,9 @@ const App = () => {
     <div>
       <h2>login to application</h2>
       <Notification message={errorText} setErrorText={setErrorText} color={errorColor} />
-      <InputField id='username' text='username' setValue={setUsername} inputValue={username}/>
-      <InputField id='password' text='password' setValue={setPassword} inputValue={password} />
-      <button onClick={handleLogin} >login</button>
+      <InputField data-testid='username' id='username' text='username' setValue={setUsername} inputValue={username}/>
+      <InputField data-testid='password' id='password' text='password' setValue={setPassword} inputValue={password} />
+      <button data-testid='loginButton' onClick={handleLogin} >login</button>
     </div>
   )
   }
@@ -165,20 +165,21 @@ const App = () => {
                    updateBlogs={updateBlogs}
                    user={user}
                    onBlogCreation={createNewBlog}/><br></br>
-
-      {blogs.slice().sort((a, b) => b.likes - a.likes)
-      .map(blog =>
-        <Blog
-            key={blog.id}
-            blog={blog}
-            user={user}
-            setErrorColor={setErrorColor}
-            setErrorText={setErrorText}
-            updateBlogs={updateBlogs}
-            onLikeClick={onLikeClick}
-            onDeleteClick={onDeleteClick}
-          />
-      )}
+      <div data-testid="blogList">
+        {blogs.slice().sort((a, b) => b.likes - a.likes)
+        .map(blog =>
+          <Blog
+              key={blog.id}
+              blog={blog}
+              user={user}
+              setErrorColor={setErrorColor}
+              setErrorText={setErrorText}
+              updateBlogs={updateBlogs}
+              onLikeClick={onLikeClick}
+              onDeleteClick={onDeleteClick}
+            />
+        )}
+      </div>
 
     </div>
   )

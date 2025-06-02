@@ -36,12 +36,12 @@ const BlogCreator = ({ onBlogCreation }) => {
         <InputField id="title" text="title:" setValue={setTitle} inputValue={title}>title:</InputField>
         <InputField id="author" text="author:" setValue={setAuthor} inputValue={author}></InputField>
         <InputField id="url" text="url:" setValue={setUrl} inputValue={url}></InputField>
-        <button onClick={onCreateClick} className='createButton' >create</button>
+        <button data-testid='createButton' onClick={onCreateClick} className='createButton' >create</button>
         <br></br>
         <button onClick={() => setBlogCreatorVisible(false)}>cancel</button>
       </div>
       <div style={hideWhenVisible}>
-        <button onClick={() => setBlogCreatorVisible(true)}>new blog</button>
+        <button data-testid='newBlog' onClick={() => setBlogCreatorVisible(true)}>new blog</button>
       </div>
     </div>
   )

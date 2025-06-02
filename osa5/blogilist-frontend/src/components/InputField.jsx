@@ -4,7 +4,7 @@ const InputField = ({ text, setValue, inputValue, id }) => {
   return (
     <div>
       <label htmlFor={id}>{text}</label>
-      <input id={id} value={inputValue} onChange={e => setValue(e.target.value)} />
+      <input data-testid={id} id={id} value={inputValue} onChange={e => setValue(e.target.value)} />
     </div>
   )
 }
