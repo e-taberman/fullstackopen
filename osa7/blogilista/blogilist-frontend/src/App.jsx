@@ -6,30 +6,30 @@ import InputField from "./components/InputField";
 import Notification from "./components/Notification";
 import BlogCreator from "./components/BlogCreator";
 import { setNotification } from "./reducers/notificationReducer";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  appendBlog,
+  initializeBlogs,
+  deleteBlog,
+  updateBlog,
+  increaseLikes,
+} from "./reducers/blogReducer";
+
+import { addUser, removeUser } from "./reducers/userReducer";
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    updateBlogs();
-  }, []);
+  var blogs = useSelector((state) => state.blogs);
+  var currentUser = useSelector((state) => state.user);
 
-  const updateBlogs = () => {
-    blogService
-      .getAll()
-      .then((blogs) => {
-        setBlogs(blogs);
-      })
-      .then(() => {
-        if (user === null) automaticLogin();
-      });
-  };
+  useEffect(() => {
+    automaticLogin();
+    dispatch(initializeBlogs());
+  }, []);
 
   const automaticLogin = () => {
     const localStorage = window.localStorage.getItem("user");
@@ -41,12 +41,12 @@ const App = () => {
     setPassword(parsed.password);
 
     loginService.login(parsed.username, parsed.password).then((response) => {
-      setUser(response);
+      dispatch(addUser(response));
     });
   };
 
   const handleLogout = () => {
-    setUser(null);
+    dispatch(removeUser());
     window.localStorage.removeItem("user");
   };
 
@@ -58,7 +58,7 @@ const App = () => {
           username: username,
           password: password,
         });
-        setUser(response);
+        dispatch(addUser(response));
         window.localStorage.setItem("user", loginUser);
         setUsername("");
         setPassword("");
@@ -83,7 +83,12 @@ const App = () => {
       likes: parseInt(blog.likes) + 1,
     };
     try {
-      await blogService.updateBlog(blog.id, newBlog, user);
+      const updatedBlog = await blogService.updateBlog(
+        blog.id,
+        newBlog,
+        currentUser,
+      );
+      dispatch(increaseLikes(updatedBlog.data));
     } catch (error) {
       if (error.response.status === 401) {
         dispatch(
@@ -109,8 +114,6 @@ const App = () => {
         color: "green",
       }),
     );
-
-    updateBlogs();
   };
 
   const onDeleteClick = async (blog) => {
@@ -118,9 +121,8 @@ const App = () => {
       return;
     }
     try {
-      await blogService.deleteBlog(blog.id, user);
+      await blogService.deleteBlog(blog.id, currentUser);
     } catch (error) {
-      console.log(error);
       if (error.response.status === 401) {
         dispatch(
           setNotification({
@@ -145,13 +147,22 @@ const App = () => {
         color: "green",
       }),
     );
-
-    updateBlogs();
+    dispatch(deleteBlog(blog));
   };
 
   const createNewBlog = async (newBlog) => {
     try {
-      await blogService.postBlog(newBlog, user);
+      const createdBlog = await blogService.postBlog(newBlog, currentUser);
+
+      const fixedBlog = {
+        ...createdBlog.data,
+        user: {
+          name: currentUser.name,
+          username: currentUser.username,
+          id: createdBlog.data.user,
+        },
+      };
+      dispatch(appendBlog(fixedBlog));
     } catch (error) {
       if (error.response.status === 400) {
         dispatch(
@@ -176,11 +187,10 @@ const App = () => {
         color: "green",
       }),
     );
-    updateBlogs();
   };
 
   // NOT LOGGED IN
-  if (user === null) {
+  if (currentUser === null) {
     return (
       <div>
         <h2>login to application</h2>
@@ -212,7 +222,8 @@ const App = () => {
       <h2>blogs</h2>
       <Notification />
       <div>
-        {user.name} has logged in <button onClick={handleLogout}>logout</button>
+        {currentUser.name} has logged in{" "}
+        <button onClick={handleLogout}>logout</button>
       </div>
       <br></br>
 
@@ -226,8 +237,7 @@ const App = () => {
             <Blog
               key={blog.id}
               blog={blog}
-              user={user}
-              updateBlogs={updateBlogs}
+              user={currentUser}
               onLikeClick={onLikeClick}
               onDeleteClick={onDeleteClick}
             />
