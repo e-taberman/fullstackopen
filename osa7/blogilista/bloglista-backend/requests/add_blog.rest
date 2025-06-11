@@ -1,0 +1,10 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJvYjU0MyIsImlkIjoiNjgzNzUxMTgzMDdlZTgwNmVjYjQzMWM1IiwiaWF0IjoxNzQ4Njk1OTIxfQ.ZsBTtMK08yt67tqoRjT76wFTOivrbJwCd-zPEQMFio0
+
+{
+  "title": "Epic Blog!",
+  "author": "Guy",
+  "url": "www.blogs.com/epicblog",
+  "likes": 1
+}
