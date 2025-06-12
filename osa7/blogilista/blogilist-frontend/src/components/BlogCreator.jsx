@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import InputField from "./InputField";
 import PropTypes from "prop-types";
 import Table from "react-bootstrap/Table";
+import Button from "react-bootstrap/Button";
 
 const BlogCreator = ({ onBlogCreation }) => {
   const [title, setTitle] = useState("");
@@ -54,22 +55,23 @@ const BlogCreator = ({ onBlogCreation }) => {
           inputValue={url}
         ></InputField>
         <br></br>
-        <button
+        <Button
           data-testid="createButton"
           onClick={onCreateClick}
           className="createButton"
         >
-          create
-        </button>
-        <button onClick={() => setBlogCreatorVisible(false)}>cancel</button>
+          Create
+        </Button>
+        <span> </span>
+        <Button onClick={() => setBlogCreatorVisible(false)}>Cancel</Button>
       </div>
       <div style={hideWhenVisible}>
-        <button
+        <Button
           data-testid="newBlog"
           onClick={() => setBlogCreatorVisible(true)}
         >
           new blog
-        </button>
+        </Button>
       </div>
     </div>
   );

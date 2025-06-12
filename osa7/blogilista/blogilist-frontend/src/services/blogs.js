@@ -20,7 +20,6 @@ const updateBlog = (id, updateBlog, user) => {
   const config = {
     headers: { Authorization: `Bearer ${user.token}` },
   };
-  console.log(updateBlog);
   const request = axios.put(`${baseUrl}/${id}`, updateBlog, config);
   return request.then(() => request);
 };
@@ -32,9 +31,21 @@ const deleteBlog = (id, user) => {
   return axios.delete(`${baseUrl}/${id}`, config);
 };
 
+const addComment = (id, user, comment) => {
+  const config = {
+    headers: { Authorization: `Bearer ${user.token}` },
+  };
+  return axios.post(
+    `${baseUrl}/${id}/comments`,
+    { comment: comment, id: id },
+    config,
+  );
+};
+
 export default {
   getAll,
   postBlog,
   updateBlog,
   deleteBlog,
+  addComment,
 };

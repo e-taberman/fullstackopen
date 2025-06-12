@@ -23,11 +23,21 @@ const blogSlice = createSlice({
       likedBlog.likes += 1;
       return state;
     },
+    addComment(state, action) {
+      const likedBlog = state.find((blog) => blog.id === action.payload.id);
+      likedBlog.comments.push(action.payload.comment);
+    },
   },
 });
 
-export const { appendBlog, clearBlogs, deleteBlog, updateBlog, increaseLikes } =
-  blogSlice.actions;
+export const {
+  appendBlog,
+  clearBlogs,
+  deleteBlog,
+  updateBlog,
+  increaseLikes,
+  addComment,
+} = blogSlice.actions;
 
 export const initializeBlogs = () => {
   return async (dispatch) => {

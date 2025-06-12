@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
-import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
-import InputField from "./components/InputField";
 import Notification from "./components/Notification";
 import BlogCreator from "./components/BlogCreator";
 import { setNotification } from "./reducers/notificationReducer";
@@ -20,8 +18,12 @@ import { initializeUsers } from "./reducers/userListReducer";
 import { UserProfile } from "./components/UserProfile";
 import { BlogDisplay } from "./components/BlogDisplay";
 import { NavigationBar } from "./components/NavigationBar";
-
+import Button from "react-bootstrap/Button";
+import Container from "react-bootstrap/Container";
+import Table from "react-bootstrap/Table";
 import { addUser, removeUser } from "./reducers/userReducer";
+import LoginForm from "./components/LoginForm";
+import { color } from "chart.js/helpers";
 
 const App = () => {
   const [username, setUsername] = useState("");
@@ -199,27 +201,13 @@ const App = () => {
   // NOT LOGGED IN
   if (currentUser === null) {
     return (
-      <div className="container">
-        <h2>login to application</h2>
-        <Notification />
-        <InputField
-          data-testid="username"
-          id="username"
-          text="username"
-          setValue={setUsername}
-          inputValue={username}
-        />
-        <InputField
-          data-testid="password"
-          id="password"
-          text="password"
-          setValue={setPassword}
-          inputValue={password}
-        />
-        <button data-testid="loginButton" onClick={handleLogin}>
-          login
-        </button>
-      </div>
+      <LoginForm
+        username={username}
+        setUsername={setUsername}
+        password={password}
+        setPassword={setPassword}
+        handleLogin={handleLogin}
+      />
     );
   }
 
@@ -239,20 +227,29 @@ const App = () => {
               <div>
                 <BlogCreator onBlogCreation={createNewBlog} />
                 <br></br>
-                <div data-testid="blogList">
-                  {blogs
-                    .slice()
-                    .sort((a, b) => b.likes - a.likes)
-                    .map((blog) => (
-                      <Blog
-                        key={blog.id}
-                        blog={blog}
-                        user={currentUser}
-                        onLikeClick={onLikeClick}
-                        onDeleteClick={onDeleteClick}
-                      />
-                    ))}
-                </div>
+                <Table striped bordered>
+                  <thead>
+                    <tr>
+                      <th>Title</th>
+                      <th>Author</th>
+                      <th>Likes</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {blogs
+                      .slice()
+                      .sort((a, b) => b.likes - a.likes)
+                      .map((blog) => (
+                        <tr key={blog.id}>
+                          <td>
+                            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+                          </td>
+                          <td>{blog.author}</td>
+                          <td>{blog.likes}</td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </Table>
               </div>
             }
           />

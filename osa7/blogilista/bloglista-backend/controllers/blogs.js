@@ -3,6 +3,7 @@ const Blog = require("../models/blog");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const { userExtractor } = require("../utils/middleware");
+const { request } = require("../app");
 
 blogsRouter.get("/", async (request, response) => {
   const blogs = await Blog.find({}).populate("user", { username: 1, name: 1 });
@@ -71,6 +72,28 @@ blogsRouter.put("/:id", async (request, response) => {
 
     const updatedBlog = await blog.save();
     response.json(updatedBlog);
+  } catch (error) {
+    response.status(400).json({ error: error.message });
+  }
+});
+
+blogsRouter.post("/:id/comments", userExtractor, async (request, response) => {
+  const user = request.user;
+  console.log("REQUST BODY:", request.body);
+
+  if (!user.id) {
+    return response.status(401).json({ error: "invalid token" });
+  }
+
+  try {
+    const blog = await Blog.findById(request.params.id);
+    const comment = request.body.comment;
+    const id = request.body.id;
+    blog.comments.push(comment);
+
+    const savedBlog = await blog.save();
+
+    return response.status(201).json(savedBlog);
   } catch (error) {
     response.status(400).json({ error: error.message });
   }

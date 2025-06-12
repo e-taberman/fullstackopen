@@ -1,6 +1,7 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+import Button from "react-bootstrap/Button";
 
 const Blog = ({ blog, user, onLikeClick, onDeleteClick }) => {
   const [viewInfo, setViewInfo] = useState(false);
@@ -41,7 +42,7 @@ const Blog = ({ blog, user, onLikeClick, onDeleteClick }) => {
           {blog.url}
           <br></br>
           {`likes: ${blog.likes}`}{" "}
-          <button onClick={() => onLikeClick(blog)}>like</button>
+          <Button onClick={() => onLikeClick(blog)}>like</Button>
           <br></br>
           {blog.user.name}
           <br></br>

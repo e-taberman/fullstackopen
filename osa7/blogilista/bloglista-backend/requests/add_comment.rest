@@ -1,0 +1,8 @@
+POST http://localhost:3003/api/blogs/683af825e73c3c1fa3de126b/comments
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJvYjU0MyIsImlkIjoiNjgzNzUxMTgzMDdlZTgwNmVjYjQzMWM1IiwiaWF0IjoxNzQ5NzQzOTQyfQ.QwD4eqel7DURSLegTkBCZnsdIMMRo54JVQYYOKUyQRQ
+
+{
+  "id": "683af825e73c3c1fa3de126b",
+  "comment": "test comment :)"
+}
