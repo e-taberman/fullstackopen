@@ -14,6 +14,12 @@ import {
   updateBlog,
   increaseLikes,
 } from "./reducers/blogReducer";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { UserList } from "./components/UserList";
+import { initializeUsers } from "./reducers/userListReducer";
+import { UserProfile } from "./components/UserProfile";
+import { BlogDisplay } from "./components/BlogDisplay";
+import { NavigationBar } from "./components/NavigationBar";
 
 import { addUser, removeUser } from "./reducers/userReducer";
 
@@ -29,6 +35,7 @@ const App = () => {
   useEffect(() => {
     automaticLogin();
     dispatch(initializeBlogs());
+    dispatch(initializeUsers());
   }, []);
 
   const automaticLogin = () => {
@@ -192,7 +199,7 @@ const App = () => {
   // NOT LOGGED IN
   if (currentUser === null) {
     return (
-      <div>
+      <div className="container">
         <h2>login to application</h2>
         <Notification />
         <InputField
@@ -218,32 +225,52 @@ const App = () => {
 
   // LOGGED IN
   return (
-    <div>
-      <h2>blogs</h2>
-      <Notification />
-      <div>
-        {currentUser.name} has logged in{" "}
-        <button onClick={handleLogout}>logout</button>
-      </div>
-      <br></br>
+    <Router>
+      <div className="container">
+        <NavigationBar handleLogout={handleLogout} />
+        <h2>Blog App</h2>
+        <Notification />
+        <br></br>
 
-      <BlogCreator onBlogCreation={createNewBlog} />
-      <br></br>
-      <div data-testid="blogList">
-        {blogs
-          .slice()
-          .sort((a, b) => b.likes - a.likes)
-          .map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              user={currentUser}
-              onLikeClick={onLikeClick}
-              onDeleteClick={onDeleteClick}
-            />
-          ))}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <div>
+                <BlogCreator onBlogCreation={createNewBlog} />
+                <br></br>
+                <div data-testid="blogList">
+                  {blogs
+                    .slice()
+                    .sort((a, b) => b.likes - a.likes)
+                    .map((blog) => (
+                      <Blog
+                        key={blog.id}
+                        blog={blog}
+                        user={currentUser}
+                        onLikeClick={onLikeClick}
+                        onDeleteClick={onDeleteClick}
+                      />
+                    ))}
+                </div>
+              </div>
+            }
+          />
+
+          <Route path="/users" element={<UserList />} />
+          <Route path="/users/:id" element={<UserProfile />} />
+          <Route
+            path="/blogs/:id"
+            element={
+              <BlogDisplay
+                onLikeClick={onLikeClick}
+                onDeleteClick={onDeleteClick}
+              />
+            }
+          />
+        </Routes>
       </div>
-    </div>
+    </Router>
   );
 };
 

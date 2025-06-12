@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import InputField from "./InputField";
-import blogService from "../services/blogs";
 import PropTypes from "prop-types";
+import Table from "react-bootstrap/Table";
 
 const BlogCreator = ({ onBlogCreation }) => {
   const [title, setTitle] = useState("");
@@ -32,27 +32,28 @@ const BlogCreator = ({ onBlogCreation }) => {
   return (
     <div>
       <div style={showWhenVisible}>
-        <h2>create new blog</h2>
+        <h2>Create new blog</h2>
         <InputField
           id="title"
-          text="title:"
+          text="Title:"
           setValue={setTitle}
           inputValue={title}
         >
-          title:
+          {/* title: */}
         </InputField>
         <InputField
           id="author"
-          text="author:"
+          text="Author:"
           setValue={setAuthor}
           inputValue={author}
         ></InputField>
         <InputField
           id="url"
-          text="url:"
+          text="URL:"
           setValue={setUrl}
           inputValue={url}
         ></InputField>
+        <br></br>
         <button
           data-testid="createButton"
           onClick={onCreateClick}
@@ -60,7 +61,6 @@ const BlogCreator = ({ onBlogCreation }) => {
         >
           create
         </button>
-        <br></br>
         <button onClick={() => setBlogCreatorVisible(false)}>cancel</button>
       </div>
       <div style={hideWhenVisible}>

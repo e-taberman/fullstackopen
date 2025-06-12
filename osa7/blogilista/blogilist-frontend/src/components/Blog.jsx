@@ -1,6 +1,6 @@
 import { useState } from "react";
-import blogService from "../services/blogs";
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 
 const Blog = ({ blog, user, onLikeClick, onDeleteClick }) => {
   const [viewInfo, setViewInfo] = useState(false);
@@ -21,16 +21,20 @@ const Blog = ({ blog, user, onLikeClick, onDeleteClick }) => {
       <div style={hideWhenVisible}>
         <div style={blogStyle} className="blog">
           <b>
-            {blog.title}, {blog.author}
+            <Link to={`/blogs/${blog.id}`}>
+              {blog.title}, {blog.author}
+            </Link>
           </b>{" "}
-          <button onClick={() => setViewInfo(!viewInfo)}>view</button>
+          {/* <button onClick={() => setViewInfo(!viewInfo)}>view</button> */}
         </div>
       </div>
 
       <div style={showWhenVisible}>
         <div style={blogStyle} className="blogDetails">
           <b>
-            {blog.title}, {blog.author}
+            <Link to={`/blogs/${blog.id}`}>
+              {blog.title}, {blog.author}
+            </Link>
           </b>{" "}
           <button onClick={() => setViewInfo(!viewInfo)}>hide</button>
           <br></br>

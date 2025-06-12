@@ -20,6 +20,7 @@ const updateBlog = (id, updateBlog, user) => {
   const config = {
     headers: { Authorization: `Bearer ${user.token}` },
   };
+  console.log(updateBlog);
   const request = axios.put(`${baseUrl}/${id}`, updateBlog, config);
   return request.then(() => request);
 };

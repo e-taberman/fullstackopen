@@ -4,6 +4,7 @@ const InputField = ({ text, setValue, inputValue, id }) => {
   return (
     <div>
       <label htmlFor={id}>{text}</label>
+      <br></br>
       <input
         data-testid={id}
         id={id}
