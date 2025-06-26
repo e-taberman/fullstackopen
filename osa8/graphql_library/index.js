@@ -27,6 +27,7 @@ const typeDefs = `
     bookCount: Int!
     authorCount: Int!
     allBooks(author: String, genre: String): [Book!]
+    genreBooks(genre: String): [Book!]
     allAuthors: [Author!]
     me: User
     allUsers: [User!]
@@ -96,13 +97,28 @@ const resolvers = {
     me: (root, args, context) => {
       return context.currentUser;
     },
+    genreBooks: async (root, args) => {
+      if (!args.genre) {
+        return Book.find({});
+      }
+      return Book.find({ genres: args.genre });
+    },
   },
   Author: {
     name: (root) => root.name,
     born: (root) => root.born,
     id: (root) => root.id,
-    bookCount: (root) => async (root) =>
-      Book.find({ author: root.id }).countDocuments(),
+    bookCount: async (root) => {
+      return Book.find({ author: root.id }).countDocuments();
+    },
+  },
+  Book: {
+    author: async (root) => {
+      return (
+        (await Author.findOne({ name: root.author })) ||
+        (await Author.findById(root.author))
+      );
+    },
   },
   Mutation: {
     addBook: async (root, args, context) => {
