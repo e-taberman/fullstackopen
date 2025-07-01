@@ -19,11 +19,13 @@ const parseResult = (args: string[]): number[] => {
   return numbers;
 };
 
-const calculateExercises = (exerciseHours: number[]) => {
+const calculateExercises = (
+  exerciseHours: number[],
+  target: number
+): Result => {
   const sum = exerciseHours.reduce((acc, num) => acc + num, 0);
   const periodLength = exerciseHours.length;
   const trainingDays = exerciseHours.filter((a) => a !== 0).length;
-  const target = 2.0;
   const average = sum / periodLength;
 
   let rating = 1;
@@ -49,8 +51,11 @@ const calculateExercises = (exerciseHours: number[]) => {
 };
 
 try {
-  const parsedResults = parseResult(process.argv);
-  console.log(calculateExercises(parsedResults));
+  const target = 2.5;
+  if (require.main === module) {
+    const parsedResults = parseResult(process.argv);
+    console.log(calculateExercises(parsedResults, target));
+  }
 } catch (error: unknown) {
   let errorMessage = "ERROR: ";
   if (error instanceof Error) {
@@ -58,3 +63,5 @@ try {
   }
   console.log(errorMessage);
 }
+
+export default calculateExercises;
